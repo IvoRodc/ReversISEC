@@ -3,4 +3,8 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <!-- Cores ISEC -->
+    <color name="vermelhoISEC">#7D222B</color>
+    <color name="cinzaISEC">#8A817A</color>
 </resources>
