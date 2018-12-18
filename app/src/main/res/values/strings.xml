@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">ReversISEC</string>
+
+    <!-- Strings do menu do jogo -->
+    <string name="contra_computador">VS COM</string>
+    <string name="contra_jogador">VS Jogador</string>
+    <string name="em_LAN">LAN</string>
+    <string name="footer">Arquiteturas Móveis 18/19</string>
+
+    <!-- Strings do menu definiçõse -->
+    <string name="menu_perfil">Editar Perfil</string>
+    <string name="menu_histórico">Histórico</string>
+
 </resources>
