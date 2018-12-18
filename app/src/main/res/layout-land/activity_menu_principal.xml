@@ -30,8 +30,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:layout_marginTop="10dp">
+            android:gravity="center">
             <ImageView
                 android:id="@+id/logo_app"
                 android:layout_width="wrap_content"
@@ -58,7 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/contra_computador"
-                style="@style/AppTheme.Buttons"
+                style="@style/AppTheme.ButtonOutlined"
                 android:layout_margin="10dp"/>
         </LinearLayout>
 
@@ -67,10 +66,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1">
             <com.google.android.material.button.MaterialButton
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/contra_jogador"
-                style="@style/AppTheme.Buttons"
+                style="@style/AppTheme.ButtonOutlined"
                 android:layout_margin="10dp"/>
         </LinearLayout>
 
@@ -82,7 +81,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/em_LAN"
-                style="@style/AppTheme.Buttons"
+                style="@style/AppTheme.ButtonOutlined"
                 android:layout_margin="10dp"/>
         </LinearLayout>
 
@@ -100,7 +99,8 @@
             android:textColor="@color/vermelhoISEC"
             android:textSize="15sp"
             android:text="@string/footer"
-            android:layout_marginBottom="20dp"/>
+            android:layout_marginBottom="20dp"
+            android:textAlignment="center"/>
 
     </LinearLayout>
 

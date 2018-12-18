@@ -13,10 +13,26 @@
         <item name="android:windowExitTransition">@transition/change_image_transform</item>
     </style>
 
-    <style name="AppTheme.Buttons" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="AppTheme.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textSize">15sp</item>
+        <item name="android:backgroundTint">@color/vermelhoISEC</item>
+    </style>
+
+    <style name="AppTheme.ButtonOutlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:textSize">28sp</item>
         <item name="android:paddingTop">10dp</item>
         <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <!-- Estilo para as caixas de texto -->
+    <style name="AppTheme.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="hintTextAppearance">@style/AppTheme.TextInputLayout.HintText</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="boxStrokeColor">@color/cinzaISEC</item>
+
+    </style>
+    <style name="AppTheme.TextInputLayout.HintText" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
 </resources>

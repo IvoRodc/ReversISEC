@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MenuPrincipalActivity" />
-        <activity android:name=".MenuDefinicoesActivity"></activity>
+        <activity android:name=".MenuDefinicoesActivity" />
+        <activity android:name=".PerfilActivity"></activity>
     </application>
 
 </manifest>

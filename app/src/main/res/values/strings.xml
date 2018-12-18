@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">ReversISEC</string>
+    <string name="preNickname">Jogador 1</string>
 
     <!-- Strings do menu do jogo -->
     <string name="contra_computador">VS COM</string>
@@ -10,5 +11,14 @@
     <!-- Strings do menu definiçõse -->
     <string name="menu_perfil">Editar Perfil</string>
     <string name="menu_histórico">Histórico</string>
+
+    <!-- Strings do menu perfil -->
+    <string name="btnEditar">Editar</string>
+    <string name="hintUsername">Nickname</string>
+    <string name="btnGuardar">Guardar</string>
+    <string name="toastSaveNickname">Nickname modificado</string>
+
+    <!-- Digitos permitidos nas caixas de texto -->
+    <string name="digitsNickname">abcdefghijklmnopqrstuvwxyzçÇ.ãÃõÕáàóò()ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890é-ÉÀ </string>
 
 </resources>

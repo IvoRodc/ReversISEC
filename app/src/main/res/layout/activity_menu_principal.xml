@@ -54,20 +54,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/contra_computador"
-            style="@style/AppTheme.Buttons"/>
+            style="@style/AppTheme.ButtonOutlined"/>
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/contra_jogador"
-            style="@style/AppTheme.Buttons"
+            style="@style/AppTheme.ButtonOutlined"
             android:layout_marginTop="20dp"/>
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/em_LAN"
-            style="@style/AppTheme.Buttons"
+            style="@style/AppTheme.ButtonOutlined"
             android:layout_marginTop="20dp"/>
 
         <LinearLayout
@@ -81,7 +81,8 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/vermelhoISEC"
                 android:textSize="20sp"
-                android:text="@string/footer"/>
+                android:text="@string/footer"
+                android:textAlignment="center"/>
 
         </LinearLayout>
 

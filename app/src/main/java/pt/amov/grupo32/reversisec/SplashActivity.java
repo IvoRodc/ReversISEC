@@ -8,7 +8,10 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -24,6 +27,8 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        verificarSharedPreferences();
 
         appLogo = findViewById(R.id.logo_app);
         isecLogo = findViewById(R.id.logo_isec);
@@ -59,10 +64,9 @@ public class SplashActivity extends AppCompatActivity {
         ///endregion
 
 
-        //configurar listener para ativar animação do logo do ISEC
-        AnimatorSet animatorSet = new AnimatorSet();
-
         //region AnimatorListner para transição de atividades
+
+        AnimatorSet animatorSet = new AnimatorSet();
 
         animatorSet.addListener(new Animator.AnimatorListener() {
             @Override
@@ -89,15 +93,22 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
-
         //endregion
 
 
 
         animatorSet.play(moverLogo).with(fadeInAPP).with(resizeX).with(resizeY).with(fadeInISEC);
         animatorSet.start();
+    }
 
-
-
+    void verificarSharedPreferences(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String nickname = prefs.getString("PREFS_NICKNAME", null);
+        if(nickname == null){
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.clear();
+            editor.putString("PREFS_NICKNAME", getString(R.string.preNickname));
+            editor.commit();
+        }
     }
 }

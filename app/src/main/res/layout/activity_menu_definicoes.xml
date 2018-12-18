@@ -53,29 +53,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/menu_perfil"
-            style="@style/AppTheme.Buttons"/>
+            style="@style/AppTheme.ButtonOutlined"
+            android:onClick="goToPerfil"/>
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/menu_histórico"
-            style="@style/AppTheme.Buttons"
+            style="@style/AppTheme.ButtonOutlined"
             android:layout_marginTop="20dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="bottom|center_horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/vermelhoISEC"
-                android:textSize="20sp"
-                android:text="@string/footer"/>
-
-        </LinearLayout>
 
     </LinearLayout>
 
