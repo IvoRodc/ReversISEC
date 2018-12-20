@@ -56,12 +56,19 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <ImageView
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:src="@drawable/ic_account"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_foto_perfil_portrait">
+                <ImageView
+                    android:id="@+id/fotografia"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:src="@drawable/ic_account"
+                    android:scaleType="fitXY"/>
+            </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
                 style="@style/AppTheme.Button"
@@ -94,7 +101,7 @@
                     android:digits="@string/digitsNickname"
                     android:maxLines="1"
                     android:textSize="15sp"
-                    android:maxLength="20"/>
+                    android:maxLength="10"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -103,7 +110,7 @@
                 android:text="@string/btnGuardar"
                 style="@style/AppTheme.ButtonOutlined"
                 android:layout_marginTop="10dp"
-                android:onClick="saveSharedPreferences"/>
+                android:onClick="saveNickname"/>
 
         </LinearLayout>
 

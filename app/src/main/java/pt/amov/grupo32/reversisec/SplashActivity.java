@@ -3,6 +3,8 @@ package pt.amov.grupo32.reversisec;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.IntentCompat;
+import pt.amov.grupo32.reversisec.ReversISEC.GlobalProfile;
+import pt.amov.grupo32.reversisec.ReversISEC.Profile;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -13,22 +15,25 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity implements NewUserDialog.NewUserDialogListener {
 
     private static final int ANIMATION_APPLOGO_DURATION = 1000;
     private static final int ANIMATION_ISECLOGO_DURATION = 500;
     ImageView appLogo, isecLogo;
+    GlobalProfile globalProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        verificarSharedPreferences();
+        //Verificar as SharedPreferences
+        globalProfile = (GlobalProfile) getApplicationContext();
 
         appLogo = findViewById(R.id.logo_app);
         isecLogo = findViewById(R.id.logo_isec);
@@ -76,10 +81,15 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                Intent intent = new Intent(SplashActivity.this, MenuPrincipalActivity.class);
-                startActivity(intent);
-                overridePendingTransition(R.anim.fadein,R.anim.fadeout);
-                finish();
+                if(globalProfile.getProfile().getNickname()==null) {
+                    openDialog();
+                } else {
+                    Intent intent = new Intent(SplashActivity.this, MenuPrincipalActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+                    finish();
+                }
+
             }
 
             @Override
@@ -95,20 +105,33 @@ public class SplashActivity extends AppCompatActivity {
 
         //endregion
 
-
-
         animatorSet.play(moverLogo).with(fadeInAPP).with(resizeX).with(resizeY).with(fadeInISEC);
         animatorSet.start();
     }
 
-    void verificarSharedPreferences(){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String nickname = prefs.getString("PREFS_NICKNAME", null);
-        if(nickname == null){
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.clear();
-            editor.putString("PREFS_NICKNAME", getString(R.string.preNickname));
-            editor.commit();
+
+    private void openDialog(){
+        NewUserDialog dialog = new NewUserDialog();
+        dialog.show(getSupportFragmentManager(), "new user dialog");
+
+    }
+
+    @Override
+    public void applyNickname(String nick) {
+        String nickname = nick;
+        if(nickname == null || nickname.isEmpty()) {
+            reopenDialog();
+        } else {
+            globalProfile.saveNickname(nickname);
+            Intent intent = new Intent(SplashActivity.this, MenuPrincipalActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+            finish();
         }
+    }
+
+    @Override
+    public void reopenDialog() {
+        openDialog();
     }
 }

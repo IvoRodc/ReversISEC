@@ -18,6 +18,14 @@
     <string name="btnGuardar">Guardar</string>
     <string name="toastSaveNickname">Nickname modificado</string>
 
+    <!-- Strings atividade camera -->
+    <string name="btnTirarFoto">Tirar foto</string>
+
+    <!-- String dialog new user -->
+    <string name="title_newUser">Novo jogador</string>
+
+
+
     <!-- Digitos permitidos nas caixas de texto -->
     <string name="digitsNickname">abcdefghijklmnopqrstuvwxyzçÇ.ãÃõÕáàóò()ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890é-ÉÀ </string>
 

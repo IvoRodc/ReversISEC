@@ -7,4 +7,5 @@
     <!-- Cores ISEC -->
     <color name="vermelhoISEC">#7D222B</color>
     <color name="cinzaISEC">#8A817A</color>
+    <color name="branco">#FFFFFF</color>
 </resources>
