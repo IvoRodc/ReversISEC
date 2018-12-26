@@ -109,7 +109,7 @@ public class GameActivity extends AppCompatActivity{
         //clearBoard();
         game.clearBoard();
         calcPontuacao();
-        whiteSide.setBackgroundColor(Color.GREEN);
+        whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
     }
 
     private void setUpTabuleiro(LinearLayout llframe, LinearLayout llBoard){
@@ -277,13 +277,12 @@ public class GameActivity extends AppCompatActivity{
         myTurn = game.currentPlayer;
 
         if(myTurn == Peca.WHITE){
-            whiteSide.setBackgroundColor(Color.GREEN);
-            blackSide.setBackgroundColor(Color.WHITE);
+            whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+            blackSide.setBackgroundColor(0);
         }else if(myTurn == Peca.BLACK){
-            blackSide.setBackgroundColor(Color.GREEN);
-            whiteSide.setBackgroundColor(Color.WHITE);
+            blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+            whiteSide.setBackgroundColor(0);
         }
-
     }
 
 
