@@ -31,6 +31,7 @@
 
     <!-- Strings atividade camera -->
     <string name="btnTirarFoto">Tirar foto</string>
+    <string name="permissionDenied">Não foram dadas as permissões para tirar a foto</string>
 
     <!-- String dialog new user -->
     <string name="title_newUser">Novo jogador</string>

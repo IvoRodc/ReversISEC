@@ -2,6 +2,8 @@ package pt.amov.grupo32.reversisec;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.GlobalProfile;
 
 import android.Manifest;
@@ -75,16 +77,43 @@ public class CameraActivity extends AppCompatActivity {
 
     private GlobalProfile globalProfile;
 
+    private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
+    private final static String[] REQUIRED_PERMISSION = new String[]{
+            Manifest.permission.CAMERA};
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+
+        //Verficar permissões
+        checkPermission();
 
         textureView = findViewById(R.id.texture);
         textureView.setSurfaceTextureListener(textureListener);
         globalProfile= (GlobalProfile)getApplicationContext();
     }
 
+    protected void checkPermission(){
+        final List<String> missingPermission = new ArrayList<>();
+
+        for(final String permission : REQUIRED_PERMISSION) {
+            final int result = ContextCompat.checkSelfPermission(this, permission);
+            if (result != PackageManager.PERMISSION_GRANTED) {
+                missingPermission.add(permission);
+            }
+        }
+
+        if(!missingPermission.isEmpty()){
+            final String[] permissions = missingPermission
+                    .toArray(new String[missingPermission.size()]);
+            ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE_ASK_PERMISSIONS);
+        } else {
+            final int[] grantResults = new int[REQUIRED_PERMISSION.length];
+            Arrays.fill(grantResults, PackageManager.PERMISSION_GRANTED);
+            onRequestPermissionsResult(REQUEST_CODE_ASK_PERMISSIONS, REQUIRED_PERMISSION, grantResults);
+        }
+    }
 
     void goBack(View v){
         finish();
@@ -352,10 +381,14 @@ public class CameraActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(grantResults[0] == PackageManager.PERMISSION_DENIED){
-            //SE PERMISSÃO NEGADA FECHA A ATIVIDADE
-            finish();
+        if(requestCode == REQUEST_CODE_ASK_PERMISSIONS){
+            for(int index = permissions.length-1; index>=0; --index){
+                if(grantResults[index] != PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, getString(R.string.permissionDenied), Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+            }
         }
     }
 
