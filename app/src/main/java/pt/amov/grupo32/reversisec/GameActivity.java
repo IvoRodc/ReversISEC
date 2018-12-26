@@ -8,7 +8,11 @@ import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.GlobalProfile;
 import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.Profile;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -51,6 +55,17 @@ public class GameActivity extends AppCompatActivity{
         setContentView(R.layout.activity_game);
 
         globalProfile = (GlobalProfile)getApplicationContext();
+        //Definir nickname do jogador
+        ((TextView)findViewById(R.id.nickPlayer1)).setText(globalProfile.getProfile().getNickname());
+        //Definir foto do jogador
+        byte[] foto = globalProfile.getProfile().getFotografia();
+        if(foto!=null) {
+            Bitmap bmp = BitmapFactory.decodeByteArray(foto, 0, foto.length);
+            ImageView iv = findViewById(R.id.fotoPlayer1);
+            BitmapDrawable image = new BitmapDrawable(iv.getResources(), bmp);
+            iv.setImageBitmap(image.getBitmap());
+        }
+
 
         LLFrame = findViewById(R.id.linearLayout_BOARD);
         LLTabuleiro = findViewById(R.id.board);
