@@ -17,8 +17,8 @@
             android:layout_height="wrap_content"
             android:gravity="left">
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/ic_back"
                 android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
@@ -60,8 +60,7 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/shape_foto_perfil_portrait">
+                android:layout_height="wrap_content">
                 <ImageView
                     android:id="@+id/fotografia"
                     android:layout_width="150dp"

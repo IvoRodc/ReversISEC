@@ -3,11 +3,10 @@
     package="pt.amov.grupo32.reversisec">
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.hardware.camera2.full" />
 
     <application
-        android:name=".ReversISEC.GlobalProfile"
+        android:name=".ReversISEC.SharedPreferences.GlobalProfile"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -24,7 +23,10 @@
         <activity android:name=".MenuPrincipalActivity" />
         <activity android:name=".MenuDefinicoesActivity" />
         <activity android:name=".PerfilActivity" />
-        <activity android:name=".CameraActivity"></activity>
+        <activity
+            android:name=".CameraActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".GameActivity"></activity>
     </application>
 
 </manifest>

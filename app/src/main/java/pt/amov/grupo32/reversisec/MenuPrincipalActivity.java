@@ -8,6 +8,9 @@ import android.view.View;
 
 public class MenuPrincipalActivity extends AppCompatActivity {
 
+    private static final String INTENT_GAME_MODE = "INTENT_GAME_MODE";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,6 +19,18 @@ public class MenuPrincipalActivity extends AppCompatActivity {
 
     void goToMenuDefinicoes(View v){
         Intent intent = new Intent(this, MenuDefinicoesActivity.class);
+        startActivity(intent);
+    }
+
+    void startVSCOM(View v){
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra(INTENT_GAME_MODE, 0);
+        startActivity(intent);
+    }
+
+    void startVSPLAYER(View v){
+        Intent intent = new Intent(this, GameActivity.class);
+        intent.putExtra(INTENT_GAME_MODE, 1);
         startActivity(intent);
     }
 

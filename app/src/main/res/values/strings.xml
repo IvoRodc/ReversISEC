@@ -17,13 +17,23 @@
     <string name="hintUsername">Nickname</string>
     <string name="btnGuardar">Guardar</string>
     <string name="toastSaveNickname">Nickname modificado</string>
+    <string name="guadarSucesso">Nickname alterado com sucesso</string>
+    <string name="guadarFail">Não foi possível guardar as alterações</string>
+    <string name="emptyFieldNick">O Nickname não pode ser nulo</string>
+    <string name="nickInvalido">O Nickname introduzido não é válido</string>
+
+    <!-- String GameActivity -->
+    <string name="pontuacao">%1$d : %2$d</string>
+    <string name="jogadaForaVez">Espere pela sua vez de jogar</string>
+    <string name="jogadaInvalida">A jogada é inválida</string>
+    <string name="btnJogar2X">Jogar 2X</string>
+    <string name="btnPassarVez">Passar</string>
 
     <!-- Strings atividade camera -->
     <string name="btnTirarFoto">Tirar foto</string>
 
     <!-- String dialog new user -->
     <string name="title_newUser">Novo jogador</string>
-
 
 
     <!-- Digitos permitidos nas caixas de texto -->

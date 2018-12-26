@@ -1,22 +1,14 @@
 package pt.amov.grupo32.reversisec;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.content.IntentCompat;
-import pt.amov.grupo32.reversisec.ReversISEC.GlobalProfile;
-import pt.amov.grupo32.reversisec.ReversISEC.Profile;
+import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.GlobalProfile;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 

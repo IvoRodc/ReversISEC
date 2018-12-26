@@ -1,33 +1,28 @@
 package pt.amov.grupo32.reversisec;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.drawable.RoundedBitmapDrawable;
-import pt.amov.grupo32.reversisec.ReversISEC.GlobalProfile;
-import pt.amov.grupo32.reversisec.ReversISEC.Profile;
+import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.GlobalProfile;
+import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.Profile;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.RectF;
-import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 public class PerfilActivity extends AppCompatActivity {
 
-    TextInputEditText nicknameView;
+    TextInputLayout nicknameIL;
+    TextInputEditText nicknameET;
     ImageView ivFotografia;
     private GlobalProfile globalProfile;
     Profile profile;
@@ -37,7 +32,8 @@ public class PerfilActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_perfil);
 
-        nicknameView = findViewById(R.id.nicknameText);
+        nicknameIL = findViewById(R.id.nicknameLayout);
+        nicknameET = findViewById(R.id.nicknameText);
         ivFotografia = findViewById(R.id.fotografia);
         globalProfile = (GlobalProfile)getApplicationContext();
         Log.w("Nick PerfilCreate xpto", globalProfile.getProfile().getNickname());
@@ -47,7 +43,7 @@ public class PerfilActivity extends AppCompatActivity {
 
 
         //carregar dados da SharedPreferences
-        nicknameView.setText(profile.getNickname());
+        nicknameET.setText(profile.getNickname());
         if(profile.getFotografia()!=null) {
             setPicture(profile.getFotografia());
         }
@@ -63,8 +59,42 @@ public class PerfilActivity extends AppCompatActivity {
     }
 
     void saveNickname(View v){
-        String name = nicknameView.getText().toString();
-        globalProfile.saveNickname(name);
+
+        boolean valido = true;
+        if(nicknameET.getText().toString().isEmpty()){
+            nicknameIL.setError(getString(R.string.emptyFieldNick));
+            valido = false;
+        } else if(nicknameET.getText().toString().equalsIgnoreCase("COM")){
+            nicknameIL.setError(getString(R.string.nickInvalido));
+            valido = false;
+        }
+
+        nicknameET.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                nicknameIL.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        if(valido) {
+            try {
+                String name = nicknameET.getText().toString();
+                globalProfile.saveNickname(name);
+                Toast.makeText(this, getString(R.string.guadarSucesso), Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(this, getString(R.string.guadarFail), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void setPicture(byte[] foto){
@@ -87,7 +117,7 @@ public class PerfilActivity extends AppCompatActivity {
         if(profile.getFotografia()!=null) {
             setPicture(profile.getFotografia());
         }
-        nicknameView.setText(profile.getNickname());
+        nicknameET.setText(profile.getNickname());
         Log.w("Nick PerfilResume xpto", globalProfile.getProfile().getNickname());
         if(globalProfile.getProfile().getFotografia()!=null)
             Log.w("Foto PerfilResume xpto", globalProfile.getProfile().getFotografia().toString());

@@ -1,4 +1,4 @@
-package pt.amov.grupo32.reversisec.ReversISEC;
+package pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences;
 
 
 public class Profile{

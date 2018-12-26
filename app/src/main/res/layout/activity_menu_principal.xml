@@ -17,8 +17,8 @@
             android:layout_height="wrap_content"
             android:gravity="right">
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="top|left"
                 android:src="@drawable/ic_settings"
                 android:layout_marginTop="10dp"
@@ -54,14 +54,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/contra_computador"
-            style="@style/AppTheme.ButtonOutlined"/>
+            style="@style/AppTheme.ButtonOutlined"
+            android:onClick="startVSCOM"/>
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/contra_jogador"
             style="@style/AppTheme.ButtonOutlined"
-            android:layout_marginTop="20dp"/>
+            android:layout_marginTop="20dp"
+            android:onClick="startVSPLAYER"/>
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
