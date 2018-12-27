@@ -28,6 +28,8 @@
     <string name="jogadaInvalida">A jogada é inválida</string>
     <string name="btnJogar2X">Jogar 2X</string>
     <string name="btnPassarVez">Passar</string>
+    <string name="tituloVenceu">%1$s venceu!</string>
+    <string name="mensagemDialogo">%1$s - %2$d   :   %3$d - %4$s</string>
 
     <!-- Strings atividade camera -->
     <string name="btnTirarFoto">Tirar foto</string>

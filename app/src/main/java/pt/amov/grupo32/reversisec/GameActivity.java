@@ -1,5 +1,6 @@
 package pt.amov.grupo32.reversisec;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.Peca;
 import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.Player;
@@ -285,23 +286,44 @@ public class GameActivity extends AppCompatActivity{
             Toast.makeText(this, R.string.jogadaInvalida, Toast.LENGTH_SHORT).show();
             return;
         }
-        game.nextTurn(false);
+        boolean gameover = game.nextTurn(false);
 
-        //CORRIGIR JOGADA DO PC
-        if(gameMode == 0){
-            JogadaCOMTHREAD thread = new JogadaCOMTHREAD(this);
-            thread.execute();
-        }
-        turn = game.currentPlayer;
+        if(gameover == false){
+            gameOver();
+        } else {
+            //CORRIGIR JOGADA DO PC
+            if (gameMode == 0) {
+                JogadaCOMTHREAD thread = new JogadaCOMTHREAD(this);
+                thread.execute();
+            }
+            turn = game.currentPlayer;
 
-        if(turn == Peca.WHITE){
-            whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
-            blackSide.setBackgroundColor(0);
-        }else if(turn == Peca.BLACK){
-            blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
-            whiteSide.setBackgroundColor(0);
+            if (turn == Peca.WHITE) {
+                whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+                blackSide.setBackgroundColor(0);
+            } else if (turn == Peca.BLACK) {
+                blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+                whiteSide.setBackgroundColor(0);
+            }
         }
     }
+
+    private void gameOver(){
+        if(gameMode == 0 || gameMode == 1) {
+            String pontuacao = tvPontuacao.getText().toString();
+            String vencedor = (players.get(0).getPontuacao() > players.get(1).getPontuacao()) ? players.get(0).getNickname() : players.get(1).getNickname();
+            String titulo = getString(R.string.tituloVenceu, vencedor);
+            String dialogo = getString(R.string.mensagemDialogo, players.get(0).getNickname(),
+                    players.get(0).getPontuacao(), players.get(1).getPontuacao(), players.get(1).getNickname());
+
+            AlertDialog ad = new AlertDialog.Builder(this).setTitle(titulo).setMessage(dialogo).create();
+            ad.show();
+        }
+
+        //GUARDAR NO HISTÓRICO
+    }
+
+
 
     class JogadaCOMTHREAD extends AsyncTask<Void, Void, Void>{
         Context context;
@@ -323,6 +345,7 @@ public class GameActivity extends AppCompatActivity{
 
         @Override
         protected void onPostExecute(Void aVoid) {
+            calcPontuacao();
             drawBoard();
             game.nextTurn(false);
         }

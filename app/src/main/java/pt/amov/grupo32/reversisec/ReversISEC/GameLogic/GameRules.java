@@ -79,19 +79,21 @@ public class GameRules {
         return total;
     }
 
-    public void nextTurn(boolean invalid){
+    public boolean nextTurn(boolean invalid){
         swapSides();
 
         if(!hasMoves()){
             //se o método for chamado duas vezes seguidas significa que não há mais jogadas
             if(invalid){
-                //Não há mai jogadas
-                //gameOver()
+                //Não há mais jogadas
+                return false;
             } else {
                 //passa a jogada e verifica se tem jogadas
                 moveCount++;
-                nextTurn(true);
+                return nextTurn(true);
             }
+        } else {
+            return true;
         }
     }
 
