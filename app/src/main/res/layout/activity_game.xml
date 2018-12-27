@@ -57,23 +57,28 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/botoesPlayer1"
                 android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/jogar2XPlayer1"
                     style="@style/AppTheme.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/btnJogar2X"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp"
+                    android:enabled="true"/>
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/passarVezPlayer1"
                     style="@style/AppTheme.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/btnPassarVez"
-                    android:textSize="12sp"/>
+                    android:textSize="12sp"
+                    android:enabled="true"/>
 
             </LinearLayout>
 
@@ -98,8 +103,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="end">
+            android:gravity="end"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/blackSide"
@@ -112,14 +117,40 @@
                     android:id="@+id/nickPlayer2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="COM"
-                    android:layout_marginRight="3dp"/>
+                    android:layout_marginRight="3dp"
+                    android:text="COM" />
+
                 <ImageView
                     android:id="@+id/fotoPlayer2"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_account"
-                    android:scaleType="fitXY"/>
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_account" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/botoesPlayer2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/jogar2XPlayer2"
+                    style="@style/AppTheme.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btnJogar2X"
+                    android:textSize="12sp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/passarVezPlayer2"
+                    style="@style/AppTheme.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/btnPassarVez"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 

@@ -7,6 +7,7 @@ import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.GameRules;
 import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.GlobalProfile;
 import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.Profile;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,6 +25,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.Thread.sleep;
 
 public class GameActivity extends AppCompatActivity{
 
@@ -47,7 +50,7 @@ public class GameActivity extends AppCompatActivity{
     List<Player> players;
 
     GameRules game;
-    Peca myTurn;
+    Peca turn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +118,7 @@ public class GameActivity extends AppCompatActivity{
     }
 
     private void setUpOneDevices(){
-        myTurn = Peca.WHITE;
+        turn = Peca.WHITE;
         //Player 1
         players = new ArrayList<>();
         players.add(new Player(globalProfile.getProfile(), Peca.WHITE, false));
@@ -286,17 +289,42 @@ public class GameActivity extends AppCompatActivity{
 
         //CORRIGIR JOGADA DO PC
         if(gameMode == 0){
-            game.moveCOM();
-            game.nextTurn(false);
+            JogadaCOMTHREAD thread = new JogadaCOMTHREAD(this);
+            thread.execute();
         }
-        myTurn = game.currentPlayer;
+        turn = game.currentPlayer;
 
-        if(myTurn == Peca.WHITE){
+        if(turn == Peca.WHITE){
             whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
             blackSide.setBackgroundColor(0);
-        }else if(myTurn == Peca.BLACK){
+        }else if(turn == Peca.BLACK){
             blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
             whiteSide.setBackgroundColor(0);
+        }
+    }
+
+    class JogadaCOMTHREAD extends AsyncTask<Void, Void, Void>{
+        Context context;
+
+        JogadaCOMTHREAD(Context context){
+            this.context = context;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try{
+                Thread.sleep(500);
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+            game.moveCOM();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            drawBoard();
+            game.nextTurn(false);
         }
     }
 

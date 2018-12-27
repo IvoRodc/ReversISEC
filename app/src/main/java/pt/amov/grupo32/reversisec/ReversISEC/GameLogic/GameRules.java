@@ -1,23 +1,18 @@
 package pt.amov.grupo32.reversisec.ReversISEC.GameLogic;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.view.View;
-import android.widget.ImageView;
-
-import pt.amov.grupo32.reversisec.R;
-import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.Peca;
 
 public class GameRules {
 
     private Peca[][] tabuleiroPecas;
     public Peca currentPlayer;
     int gameMode;
+    int moveCount;
 
     public GameRules(Peca[][] tabPecas, int mode){
         this.tabuleiroPecas = tabPecas;
         this.currentPlayer = Peca.WHITE;
         this.gameMode = mode;
+        moveCount = 0;
     }
 
     public void clearBoard(){
@@ -94,6 +89,7 @@ public class GameRules {
                 //gameOver()
             } else {
                 //passa a jogada e verifica se tem jogadas
+                moveCount++;
                 nextTurn(true);
             }
         }

@@ -13,9 +13,12 @@
         <item name="android:windowExitTransition">@transition/change_image_transform</item>
     </style>
 
-    <style name="AppTheme.Button" parent="Widget.MaterialComponents.Button">
+
+
+    <style name="AppTheme.Button" parent="ThemeOverlay.MaterialComponents.Dark">
         <item name="android:textSize">15sp</item>
-        <item name="android:backgroundTint">@color/vermelhoISEC</item>
+        <item name="colorButtonNormal">@color/cinzaISEC</item>
+        <item name="android:colorAccent">@color/vermelhoISEC</item>
     </style>
 
     <style name="AppTheme.ButtonOutlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
