@@ -1,18 +1,25 @@
 package pt.amov.grupo32.reversisec.ReversISEC.GameLogic;
 
 
+import android.content.Context;
+
+import pt.amov.grupo32.reversisec.GameActivity;
+
 public class GameRules {
+    GameOverInterface gameOverInterface;
 
     private Peca[][] tabuleiroPecas;
     public Peca currentPlayer;
     int gameMode;
     int moveCount;
+    public boolean gameover;
 
     public GameRules(Peca[][] tabPecas, int mode){
         this.tabuleiroPecas = tabPecas;
         this.currentPlayer = Peca.WHITE;
         this.gameMode = mode;
         moveCount = 0;
+        gameover = false;
     }
 
     public void clearBoard(){
@@ -79,21 +86,18 @@ public class GameRules {
         return total;
     }
 
-    public boolean nextTurn(boolean invalid){
+    public void nextTurn(boolean invalid){
         swapSides();
-
+        moveCount++;
         if(!hasMoves()){
             //se o método for chamado duas vezes seguidas significa que não há mais jogadas
             if(invalid){
                 //Não há mais jogadas
-                return false;
+                gameover=true;
             } else {
                 //passa a jogada e verifica se tem jogadas
-                moveCount++;
-                return nextTurn(true);
+                nextTurn(true);
             }
-        } else {
-            return true;
         }
     }
 
@@ -120,4 +124,10 @@ public class GameRules {
             }
         }
     }
+
+    public interface GameOverInterface{
+        void gameOver();
+    }
+
+
 }

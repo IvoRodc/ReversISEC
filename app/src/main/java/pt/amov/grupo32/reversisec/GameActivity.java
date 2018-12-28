@@ -2,6 +2,8 @@ package pt.amov.grupo32.reversisec;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.HistoricEntry;
+import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.HistoricList;
 import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.Peca;
 import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.Player;
 import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.GameRules;
@@ -9,6 +11,7 @@ import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.GlobalProfile;
 import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.Profile;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +20,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -24,12 +28,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Thread.sleep;
 
-public class GameActivity extends AppCompatActivity{
+public class GameActivity extends AppCompatActivity implements GameRules.GameOverInterface {
 
     private static final String INTENT_GAME_MODE = "INTENT_GAME_MODE";
 
@@ -52,6 +63,9 @@ public class GameActivity extends AppCompatActivity{
 
     GameRules game;
     Peca turn;
+    boolean gameove;
+
+    JogadaCOMTHREAD threadCOM;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -247,6 +261,14 @@ public class GameActivity extends AppCompatActivity{
     }
 
     private void drawBoard(){
+        if (turn == Peca.WHITE) {
+            whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+            blackSide.setBackgroundColor(0);
+        } else if (turn == Peca.BLACK) {
+            blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+            whiteSide.setBackgroundColor(0);
+        }
+
         for(int i=0; i<8; i++){
             for(int j=0; j<8; j++){
                 if(pecasTabuleiro[i][j] == Peca.WHITE){
@@ -286,29 +308,34 @@ public class GameActivity extends AppCompatActivity{
             Toast.makeText(this, R.string.jogadaInvalida, Toast.LENGTH_SHORT).show();
             return;
         }
-        boolean gameover = game.nextTurn(false);
-
-        if(gameover == false){
+        game.nextTurn(false);
+        turn = game.currentPlayer;
+        if (game.gameover){
             gameOver();
-        } else {
-            //CORRIGIR JOGADA DO PC
-            if (gameMode == 0) {
-                JogadaCOMTHREAD thread = new JogadaCOMTHREAD(this);
-                thread.execute();
-            }
-            turn = game.currentPlayer;
-
-            if (turn == Peca.WHITE) {
-                whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
-                blackSide.setBackgroundColor(0);
-            } else if (turn == Peca.BLACK) {
-                blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
-                whiteSide.setBackgroundColor(0);
-            }
         }
+
+        //CORRIGIR JOGADA DO PC
+        if (gameMode == 0) {
+            threadCOM = new JogadaCOMTHREAD(this);
+            threadCOM.execute();
+        }
+
     }
 
-    private void gameOver(){
+    @Override
+    public void gameOver(){
+        calcPontuacao();
+        //GUARDAR NO HISTÓRICO
+        HistoricEntry entry = new HistoricEntry(players.get(0).getNickname(),
+                players.get(0).getPontuacao(),
+                players.get(1).getNickname(),
+                players.get(1).getPontuacao());
+        try {
+            saveToHistory(entry);
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
         if(gameMode == 0 || gameMode == 1) {
             String pontuacao = tvPontuacao.getText().toString();
             String vencedor = (players.get(0).getPontuacao() > players.get(1).getPontuacao()) ? players.get(0).getNickname() : players.get(1).getNickname();
@@ -316,14 +343,45 @@ public class GameActivity extends AppCompatActivity{
             String dialogo = getString(R.string.mensagemDialogo, players.get(0).getNickname(),
                     players.get(0).getPontuacao(), players.get(1).getPontuacao(), players.get(1).getNickname());
 
-            AlertDialog ad = new AlertDialog.Builder(this).setTitle(titulo).setMessage(dialogo).create();
+            AlertDialog.Builder ad = new AlertDialog.Builder(this);
+            ad.setTitle(titulo);
+            ad.setMessage(dialogo);
+            ad.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            ad.create();
             ad.show();
         }
-
-        //GUARDAR NO HISTÓRICO
     }
 
+    private void saveToHistory(HistoricEntry entry) throws IOException {
+        ObjectOutputStream out;
+        HistoricList historicList = new HistoricList();
 
+        File file = new File(getFilesDir(), "historico.dat");
+        if(file.exists()){
+            try{
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file));
+                historicList = (HistoricList)ois.readObject();
+                ois.close();
+            } catch (ClassNotFoundException e){
+                e.printStackTrace();
+            }
+        }
+
+        historicList.addEntry(entry);
+        try{
+            File outFile = new File(getFilesDir(), "historico.dat");
+            out = new ObjectOutputStream(new FileOutputStream(outFile));
+            out.writeObject(historicList);
+            out.close();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 
     class JogadaCOMTHREAD extends AsyncTask<Void, Void, Void>{
         Context context;
@@ -333,21 +391,47 @@ public class GameActivity extends AppCompatActivity{
         }
 
         @Override
+        protected void onPreExecute() {
+            drawBoard();
+        }
+
+        @Override
         protected Void doInBackground(Void... voids) {
-            try{
+            try {
                 Thread.sleep(500);
-            }catch (InterruptedException e){
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            game.moveCOM();
+            while (turn==Peca.BLACK && !game.gameover && gameMode==0) {
+                game.moveCOM();
+                game.nextTurn(false);
+                turn = game.currentPlayer;
+                publishProgress();
+                if(turn==Peca.BLACK && !game.gameover){
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
             return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+            calcPontuacao();
+            drawBoard();
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             calcPontuacao();
             drawBoard();
-            game.nextTurn(false);
+            if(game.gameover){
+                gameOver();
+            }
         }
     }
 
