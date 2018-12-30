@@ -11,14 +11,37 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
-        android:paddingStart="10dp">
-        <ImageView
-            android:layout_gravity="start"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:src="@drawable/ic_back"
-            android:tint="@color/cinzaISEC"
-            android:onClick="onBackButton"/>
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="start">
+            <ImageView
+                android:layout_gravity="start"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_back"
+                android:tint="@color/cinzaISEC"
+                android:onClick="onBackButton"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="end">
+            <ImageView
+                android:id="@+id/btnMudarModo"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:gravity="end"
+                android:src="@drawable/ic_enter"
+                android:tint="@color/cinzaISEC"
+                android:onClick="changeGameMode"/>
+        </LinearLayout>
+
+
     </LinearLayout>
 
 

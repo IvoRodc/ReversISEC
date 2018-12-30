@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">ReversISEC</string>
-    <string name="preNickname">Jogador 1</string>
 
     <!-- Strings do menu do jogo -->
     <string name="contra_computador">VS COM</string>
@@ -10,7 +9,8 @@
 
     <!-- Strings do menu definiçõse -->
     <string name="menu_perfil">Editar Perfil</string>
-    <string name="menu_histórico">Histórico</string>
+    <string name="menu_historico">Histórico</string>
+    <string name="menu_creditos">Créditos</string>
 
     <!-- Strings do menu perfil -->
     <string name="btnEditar">Editar</string>
@@ -30,6 +30,10 @@
     <string name="btnPassarVez">Passar</string>
     <string name="tituloVenceu">%1$s venceu!</string>
     <string name="mensagemDialogo">%1$s - %2$d   :   %3$d - %4$s</string>
+    <string name="tituloMudarModo">Mudar modo de jogo</string>
+    <string name="mensagemMudarModo">Tem a certeza que prentende mudar o modo de jogo?</string>
+    <string name="tituloSair">Sair</string>
+    <string name="mensagemSair">Tem a certeza que pretende sair?</string>
 
     <!-- Strings atividade camera -->
     <string name="btnTirarFoto">Tirar foto</string>
@@ -37,6 +41,13 @@
 
     <!-- String dialog new user -->
     <string name="title_newUser">Novo jogador</string>
+
+    <!-- Strings historico -->
+    <string name="itemPlayer1">%1$s - %2$d</string>
+    <string name="itemPlayer2">%1$d - %2$s</string>
+
+    <!-- Strings créditos -->
+    <string name="realizadoPor">Trabalho realizado por:</string>
 
 
     <!-- Digitos permitidos nas caixas de texto -->

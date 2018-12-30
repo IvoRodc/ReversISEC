@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MenuDefinicoesActivity"
+    tools:context=".HistoricoActivity"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingBottom="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,43 +39,22 @@
                 android:layout_gravity="center"
                 android:src="@drawable/logo_app"/>
         </LinearLayout>
-
-
-
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/shadow"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="50dp"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listaHistorico"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/menu_perfil"
-            style="@style/AppTheme.ButtonOutlined"
-            android:onClick="goToPerfil"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/menu_historico"
-            style="@style/AppTheme.ButtonOutlined"
-            android:layout_marginTop="20dp"
-            android:onClick="goToHistorico"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/menu_creditos"
-            style="@style/AppTheme.ButtonOutlined"
-            android:layout_marginTop="20dp"
-            android:onClick="goToCreditos"/>
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
-
-
-
 
 </LinearLayout>

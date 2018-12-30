@@ -17,10 +17,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -32,18 +30,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.Thread.sleep;
-
 public class GameActivity extends AppCompatActivity implements GameRules.GameOverInterface {
 
     private static final String INTENT_GAME_MODE = "INTENT_GAME_MODE";
 
+    ImageView btnMudarModo;
     LinearLayout LLFrame;
     LinearLayout LLTabuleiro;
     TextView tvPontuacao;
@@ -63,7 +59,6 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
 
     GameRules game;
     Peca turn;
-    boolean gameove;
 
     JogadaCOMTHREAD threadCOM;
 
@@ -73,6 +68,7 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         setContentView(R.layout.activity_game);
 
         globalProfile = (GlobalProfile)getApplicationContext();
+
         //Definir nickname do jogador
         ((TextView)findViewById(R.id.nickPlayer1)).setText(globalProfile.getProfile().getNickname());
         //Definir foto do jogador
@@ -84,7 +80,7 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
             iv.setImageBitmap(image.getBitmap());
         }
 
-
+        btnMudarModo = findViewById(R.id.btnMudarModo);
         LLFrame = findViewById(R.id.linearLayout_BOARD);
         LLTabuleiro = findViewById(R.id.board);
         celulasTabuleiro = new ImageView[8][8];
@@ -143,6 +139,14 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         game.clearBoard();
         calcPontuacao();
         whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+
+        switch (gameMode){
+            case 0:
+                btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_enter));
+                break;
+            case 1:
+                btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_exit));
+        }
     }
 
     private void setUpTabuleiro(LinearLayout llframe, LinearLayout llBoard){
@@ -382,6 +386,44 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
             e.printStackTrace();
         }
     }
+
+    public void changeGameMode(View v){
+        AlertDialog.Builder ad = new AlertDialog.Builder(this);
+        ad.setTitle(getString(R.string.tituloMudarModo));
+        ad.setMessage(getString(R.string.mensagemMudarModo));
+        ad.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(gameMode == 0){
+                    gameMode = 1;
+                    game.changeMode(gameMode);
+                    players.get(1).setProfile(new Profile("COM"));
+                } else if(gameMode == 1){
+                    gameMode = 0;
+                    game.changeMode(gameMode);
+                    players.get(1).setProfile(new Profile("Player 2"));
+                    if(turn == Peca.BLACK) {
+                        threadCOM = new JogadaCOMTHREAD(getApplicationContext());
+                        threadCOM.execute();
+                    }
+                }
+            }
+        });
+        ad.setNegativeButton("Nope", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+        ad.create();
+        ad.show();
+
+
+
+
+    }
+
+
 
     class JogadaCOMTHREAD extends AsyncTask<Void, Void, Void>{
         Context context;
