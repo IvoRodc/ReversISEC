@@ -93,7 +93,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/btnJogar2X"
                     android:textSize="12sp"
-                    android:enabled="true"/>
+                    android:enabled="true"
+                    android:onClick="btnJogar2X"/>
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/passarVezPlayer1"
                     style="@style/AppTheme.Button"
@@ -101,7 +102,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/btnPassarVez"
                     android:textSize="12sp"
-                    android:enabled="true"/>
+                    android:enabled="true"
+                    android:onClick="btnPassarVez"/>
 
             </LinearLayout>
 
@@ -165,7 +167,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/btnJogar2X"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:onClick="btnJogar2X"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/passarVezPlayer2"
@@ -173,7 +176,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/btnPassarVez"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:onClick="btnPassarVez"/>
 
             </LinearLayout>
 

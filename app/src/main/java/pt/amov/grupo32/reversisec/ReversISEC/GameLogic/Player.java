@@ -75,4 +75,8 @@ public class Player {
     public int getPontuacao(){
         return this.pontuacao;
     }
+
+    public Peca getCorJogador(){
+        return this.corJogador;
+    }
 }

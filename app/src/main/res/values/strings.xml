@@ -34,6 +34,7 @@
     <string name="mensagemMudarModo">Tem a certeza que prentende mudar o modo de jogo?</string>
     <string name="tituloSair">Sair</string>
     <string name="mensagemSair">Tem a certeza que pretende sair?</string>
+    <string name="cartasAntesRonda5">Apenas pode usar as cartas a partir da ronda 5</string>
 
     <!-- Strings atividade camera -->
     <string name="btnTirarFoto">Tirar foto</string>

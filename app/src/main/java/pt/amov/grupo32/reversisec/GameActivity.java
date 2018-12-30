@@ -19,12 +19,16 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +42,16 @@ import java.util.List;
 public class GameActivity extends AppCompatActivity implements GameRules.GameOverInterface {
 
     private static final String INTENT_GAME_MODE = "INTENT_GAME_MODE";
+    private static final String ID_JOGAR2X_PLAYER1 = "jogar2XPlayer1";
+    private static final String ID_JOGAR2X_PLAYER2 = "jogar2XPlayer2";
+    private static final String ID_PASSARJOGADA_PLAYER1 = "passarVezPlayer1";
+    private static final String ID_PASSARJOGADA_PLAYER2 = "passarVezPlayer2";
+
+
+    LinearLayout llBotoesPlayer2;
+    TextView nickP1, nickP2;
+    ImageView fotoP1, fotoP2;
+
 
     ImageView btnMudarModo;
     LinearLayout LLFrame;
@@ -69,15 +83,20 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
 
         globalProfile = (GlobalProfile)getApplicationContext();
 
+        llBotoesPlayer2 = findViewById(R.id.botoesPlayer2);
+        nickP1 = findViewById(R.id.nickPlayer1);
+        nickP2 = findViewById(R.id.nickPlayer2);
+        fotoP1 = findViewById(R.id.fotoPlayer1);
+        fotoP2 = findViewById(R.id.fotoPlayer2);
+
         //Definir nickname do jogador
-        ((TextView)findViewById(R.id.nickPlayer1)).setText(globalProfile.getProfile().getNickname());
+        nickP1.setText(globalProfile.getProfile().getNickname());
         //Definir foto do jogador
         byte[] foto = globalProfile.getProfile().getFotografia();
         if(foto!=null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(foto, 0, foto.length);
-            ImageView iv = findViewById(R.id.fotoPlayer1);
-            BitmapDrawable image = new BitmapDrawable(iv.getResources(), bmp);
-            iv.setImageBitmap(image.getBitmap());
+            BitmapDrawable image = new BitmapDrawable(fotoP1.getResources(), bmp);
+            fotoP1.setImageBitmap(image.getBitmap());
         }
 
         btnMudarModo = findViewById(R.id.btnMudarModo);
@@ -97,7 +116,8 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         //gamemode:
         //  -> 0 - single player (default)
         //  -> 1 - multiplayer (same device)
-        //  -> 2 - multiplayer (dif. device)
+        //  -> 2 - LAN server
+        //  -> 3 - LAN client
         gameMode = intent.getIntExtra(INTENT_GAME_MODE, 0);
         switch (gameMode) {
             case 0:     //SINGLE PLAYER
@@ -107,7 +127,10 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
                 setUpOneDevices();
                 break;
             case 2:
-                //MULTIPLAYER 2 DEVICES
+                //LAN server
+                break;
+            case 3:
+                //LAN client
                 break;
         }
 
@@ -133,12 +156,21 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         //Player 1
         players = new ArrayList<>();
         players.add(new Player(globalProfile.getProfile(), Peca.WHITE, false));
-        //COM
-        players.add(new Player(new Profile("COM"), Peca.BLACK, true));
-        //clearBoard();
+
+        //Player 2
+        if(gameMode == 0) {
+            players.add(new Player(new Profile("COM"), Peca.BLACK, true));
+            llBotoesPlayer2.setVisibility(View.GONE);
+        }
+        else if(gameMode == 1)
+            players.add(new Player(new Profile("Player 2"), Peca.BLACK, true));
+
         game.clearBoard();
         calcPontuacao();
         whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+
+        nickP1.setText(players.get(0).getNickname());
+        nickP2.setText(players.get(1).getNickname());
 
         switch (gameMode){
             case 0:
@@ -146,7 +178,10 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
                 break;
             case 1:
                 btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_exit));
+                break;
         }
+
+
     }
 
     private void setUpTabuleiro(LinearLayout llframe, LinearLayout llBoard){
@@ -252,12 +287,21 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
                 celulasTabuleiro[i][j].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String id = getResources().getResourceName(v.getId());
-                        int l = id.charAt(id.length() - 2) - 'a';
-                        int c = Character.getNumericValue(id.charAt(id.length() - 1 )) - 1;
-                        handleMove(l, c);
-                        calcPontuacao();
-                        drawBoard();
+                        if(gameMode == 0 || gameMode == 2 || gameMode==3 && players.get(0).getCorJogador()==game.currentPlayer) {
+                            String id = getResources().getResourceName(v.getId());
+                            int l = id.charAt(id.length() - 2) - 'a';
+                            int c = Character.getNumericValue(id.charAt(id.length() - 1)) - 1;
+                            handleMove(l, c);
+                            calcPontuacao();
+                            drawBoard();
+                        } else if(gameMode == 1){
+                            String id = getResources().getResourceName(v.getId());
+                            int l = id.charAt(id.length() - 2) - 'a';
+                            int c = Character.getNumericValue(id.charAt(id.length() - 1)) - 1;
+                            handleMove(l, c);
+                            calcPontuacao();
+                            drawBoard();
+                        }
                     }
                 });
             }
@@ -265,10 +309,10 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
     }
 
     private void drawBoard(){
-        if (turn == Peca.WHITE) {
+        if (game.currentPlayer == Peca.WHITE) {
             whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
             blackSide.setBackgroundColor(0);
-        } else if (turn == Peca.BLACK) {
+        } else if (game.currentPlayer == Peca.BLACK) {
             blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
             whiteSide.setBackgroundColor(0);
         }
@@ -318,8 +362,9 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
             gameOver();
         }
 
-        //CORRIGIR JOGADA DO PC
-        if (gameMode == 0) {
+
+        //Jogada do computador
+        if (gameMode == 0 && !game.jogaNovamente) {
             threadCOM = new JogadaCOMTHREAD(this);
             threadCOM.execute();
         }
@@ -397,15 +442,19 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
                 if(gameMode == 0){
                     gameMode = 1;
                     game.changeMode(gameMode);
-                    players.get(1).setProfile(new Profile("COM"));
+                    players.get(1).setProfile(new Profile("Player 2"));
+                    nickP2.setText(players.get(1).getNickname());
+                    llBotoesPlayer2.setVisibility(View.VISIBLE);
                 } else if(gameMode == 1){
                     gameMode = 0;
                     game.changeMode(gameMode);
-                    players.get(1).setProfile(new Profile("Player 2"));
+                    players.get(1).setProfile(new Profile("COM"));
+                    nickP2.setText(players.get(1).getNickname());
                     if(turn == Peca.BLACK) {
                         threadCOM = new JogadaCOMTHREAD(getApplicationContext());
                         threadCOM.execute();
                     }
+                    llBotoesPlayer2.setVisibility(View.GONE);
                 }
             }
         });
@@ -421,6 +470,62 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
 
 
 
+    }
+
+    public void btnJogar2X(View v){
+        String id = getResources().getResourceEntryName(v.getId());
+        if(game.moveCount/2 > 5) {
+            if (id.equals(ID_JOGAR2X_PLAYER1)) {
+                if (game.currentPlayer == players.get(0).getCorJogador() && players.get(0).podeJogarNovamente()) {
+                    players.get(0).usouJogarNovamente();
+                    game.jogaNovamente = true;
+                    v.setEnabled(false);
+                } else {
+                    Toast.makeText(this, getString(R.string.jogadaForaVez), Toast.LENGTH_SHORT).show();
+                }
+            } else if(id.equals(ID_JOGAR2X_PLAYER2) && gameMode == 1){
+                if (game.currentPlayer == players.get(1).getCorJogador() && players.get(1).podeJogarNovamente()) {
+                    players.get(1).usouJogarNovamente();
+                    game.jogaNovamente = true;
+                    v.setEnabled(false);
+                } else {
+                    Toast.makeText(this, getString(R.string.jogadaForaVez), Toast.LENGTH_SHORT).show();
+                }
+            }
+        } else {
+            Toast.makeText(this, getString(R.string.cartasAntesRonda5), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void btnPassarVez(View v){
+        String id = getResources().getResourceEntryName(v.getId());
+        if(game.moveCount/2 > 5) {
+            if(id.equals(ID_PASSARJOGADA_PLAYER1)){
+                if(game.currentPlayer == players.get(0).getCorJogador() && players.get(0).podePassarVez()){
+                    players.get(0).usouPassarVez();
+                    v.setEnabled(false);
+                    game.nextTurn(false);
+                    drawBoard();
+                    if(gameMode == 0){
+                        threadCOM = new JogadaCOMTHREAD(this);
+                        threadCOM.execute();
+                    }
+                } else {
+                    Toast.makeText(this, getString(R.string.jogadaForaVez), Toast.LENGTH_SHORT).show();
+                }
+            } else if(id.equals(ID_PASSARJOGADA_PLAYER2) && gameMode == 1){
+                if(game.currentPlayer == players.get(1).getCorJogador() && players.get(1).podePassarVez()){
+                    players.get(1).usouPassarVez();
+                    v.setEnabled(false);
+                    game.nextTurn(false);
+                    drawBoard();
+                }  else {
+                    Toast.makeText(this, getString(R.string.jogadaForaVez), Toast.LENGTH_SHORT).show();
+                }
+            }
+        } else {
+            Toast.makeText(this, getString(R.string.cartasAntesRonda5), Toast.LENGTH_SHORT).show();
+        }
     }
 
 

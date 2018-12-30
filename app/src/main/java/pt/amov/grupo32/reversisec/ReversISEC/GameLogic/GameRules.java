@@ -11,8 +11,10 @@ public class GameRules {
     private Peca[][] tabuleiroPecas;
     public Peca currentPlayer;
     int gameMode;
-    int moveCount;
+    public int moveCount;
     public boolean gameover;
+
+    public boolean jogaNovamente;
 
     public GameRules(Peca[][] tabPecas, int mode){
         this.tabuleiroPecas = tabPecas;
@@ -20,6 +22,7 @@ public class GameRules {
         this.gameMode = mode;
         moveCount = 0;
         gameover = false;
+        jogaNovamente = false;
     }
 
     public void changeMode(int mode){
@@ -91,7 +94,11 @@ public class GameRules {
     }
 
     public void nextTurn(boolean invalid){
-        swapSides();
+        if(!jogaNovamente)
+            swapSides();
+        else
+            jogaNovamente = false;
+
         moveCount++;
         if(!hasMoves()){
             //se o método for chamado duas vezes seguidas significa que não há mais jogadas
