@@ -1,10 +1,5 @@
 package pt.amov.grupo32.reversisec.ReversISEC.GameLogic;
 
-
-import android.content.Context;
-
-import pt.amov.grupo32.reversisec.GameActivity;
-
 public class GameRules {
     GameOverInterface gameOverInterface;
 

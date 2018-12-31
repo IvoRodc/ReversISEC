@@ -67,12 +67,11 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
     private ImageView[][] celulasTabuleiro;
     private Peca[][] pecasTabuleiro;
 
-    //players[0] -> Player 1
-    //players[1] -> Player 2
+    //players[0] -> Player do telemóvel
+    //players[1] -> Outro Player
     List<Player> players;
 
     GameRules game;
-    Peca turn;
 
     JogadaCOMTHREAD threadCOM;
 
@@ -152,7 +151,6 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
     }
 
     private void setUpOneDevices(){
-        turn = Peca.WHITE;
         //Player 1
         players = new ArrayList<>();
         players.add(new Player(globalProfile.getProfile(), Peca.WHITE, false));
@@ -357,7 +355,6 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
             return;
         }
         game.nextTurn(false);
-        turn = game.currentPlayer;
         if (game.gameover){
             gameOver();
         }
@@ -445,16 +442,19 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
                     players.get(1).setProfile(new Profile("Player 2"));
                     nickP2.setText(players.get(1).getNickname());
                     llBotoesPlayer2.setVisibility(View.VISIBLE);
+                    btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_exit));
+
                 } else if(gameMode == 1){
                     gameMode = 0;
                     game.changeMode(gameMode);
                     players.get(1).setProfile(new Profile("COM"));
                     nickP2.setText(players.get(1).getNickname());
-                    if(turn == Peca.BLACK) {
+                    if(game.currentPlayer == Peca.BLACK) {
                         threadCOM = new JogadaCOMTHREAD(getApplicationContext());
                         threadCOM.execute();
                     }
                     llBotoesPlayer2.setVisibility(View.GONE);
+                    btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_enter));
                 }
             }
         });
@@ -528,8 +528,6 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         }
     }
 
-
-
     class JogadaCOMTHREAD extends AsyncTask<Void, Void, Void>{
         Context context;
 
@@ -549,12 +547,11 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            while (turn==Peca.BLACK && !game.gameover && gameMode==0) {
+            while (game.currentPlayer==Peca.BLACK && !game.gameover && gameMode==0) {
                 game.moveCOM();
                 game.nextTurn(false);
-                turn = game.currentPlayer;
                 publishProgress();
-                if(turn==Peca.BLACK && !game.gameover){
+                if(game.currentPlayer==Peca.BLACK && !game.gameover){
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e){
