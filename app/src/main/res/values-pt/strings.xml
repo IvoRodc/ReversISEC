@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">ReversISEC</string>
+
+    <!-- Strings do menu principal -->
+    <string name="contra_jogador">VS Jogador</string>
+    <string name="lanDialog">Pretende ser o servidor ou o cliente?</string>
+    <string name="btnCliente">Cliente</string>
+    <string name="btnServidor">Servidor</string>
+    <string name="footer">Arquiteturas Móveis 18/19</string>
+
+    <!-- Strings do menu definiçõse -->
+    <string name="menu_perfil">Editar Perfil</string>
+    <string name="menu_historico">Histórico</string>
+    <string name="menu_creditos">Créditos</string>
+
+    <!-- Strings do menu perfil -->
+    <string name="btnEditar">Editar</string>
+    <string name="hintUsername">Nickname</string>
+    <string name="btnGuardar">Guardar</string>
+    <string name="toastSaveNickname">Nickname modificado</string>
+    <string name="guadarSucesso">Nickname alterado com sucesso</string>
+    <string name="guadarFail">Não foi possível guardar as alterações</string>
+    <string name="emptyFieldNick">O Nickname não pode ser nulo</string>
+    <string name="nickInvalido">O Nickname introduzido não é válido</string>
+
+    <!-- String GameActivity -->
+    <string name="jogadaForaVez">Espere pela sua vez de jogar</string>
+    <string name="jogadaInvalida">A jogada é inválida</string>
+    <string name="btnJogar2X">Jogar 2X</string>
+    <string name="btnPassarVez">Passar</string>
+    <string name="tituloVenceu">%1$s venceu!</string>
+    <string name="tituloMudarModo">Mudar modo de jogo</string>
+    <string name="mensagemMudarModo">Tem a certeza que prentende mudar o modo de jogo?</string>
+    <string name="tituloSair">Sair</string>
+    <string name="mensagemSair">Tem a certeza que pretende sair?</string>
+    <string name="cartasAntesRonda5">Apenas pode usar as cartas a partir da ronda 5</string>
+    <string name="error_netConn">Não existe ligação à rede</string>
+    <string name="serverDlg_msg">A aguardar ligação do cliente...</string>
+    <string name="jogadorSaiu">O jogador saiu. Agora irá passar a jogar contra o computador.</string>
+    <string name="ipServidor">IP do servidor</string>
+
+
+    <!-- Strings atividade camera -->
+    <string name="btnTirarFoto">Tirar foto</string>
+    <string name="permissionDenied">Não foram dadas as permissões para tirar a foto</string>
+
+    <!-- String dialog new user -->
+    <string name="title_newUser">Novo jogador</string>
+
+
+    <!-- Strings créditos -->
+    <string name="realizadoPor">Trabalho realizado por:</string>
+
+
+</resources>
