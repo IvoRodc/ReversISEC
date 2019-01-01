@@ -16,6 +16,11 @@ public class Profile{
         fotografia = null;
     }
 
+    public Profile(String name, byte[] foto){
+        nickname = name;
+        fotografia = foto;
+    }
+
     public String getNickname(){
         return nickname;
     }

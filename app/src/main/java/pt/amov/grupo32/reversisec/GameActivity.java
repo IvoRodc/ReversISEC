@@ -10,6 +10,7 @@ import pt.amov.grupo32.reversisec.ReversISEC.GameLogic.GameRules;
 import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.GlobalProfile;
 import pt.amov.grupo32.reversisec.ReversISEC.SharedPreferences.Profile;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,12 +18,18 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,13 +37,25 @@ import android.widget.Toast;
 
 import com.google.android.material.button.MaterialButton;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 public class GameActivity extends AppCompatActivity implements GameRules.GameOverInterface {
@@ -75,10 +94,42 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
 
     JogadaCOMTHREAD threadCOM;
 
+
+    //Variáveis para ligação
+    ProgressDialog pd;
+    ServerSocket serverSocket = null;
+    Socket socketGame = null;
+    BufferedReader input;
+    PrintWriter output;
+    Handler procMsg = null;
+    private static final int PORT = 8899;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        Intent intent = getIntent();
+        //Obter dados sobre o modo de joga escolhido
+        //gamemode:
+        //  -> 0 - single player (default)
+        //  -> 1 - multiplayer (same device)
+        //  -> 2 - LAN server
+        //  -> 3 - LAN client
+        gameMode = intent.getIntExtra(INTENT_GAME_MODE, 0);
+        //Verificar se há ligação à internet para jogar em LAN
+        if(gameMode == 3 || gameMode == 4){
+            ConnectivityManager connManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = null;
+            if(connManager != null){
+                networkInfo = connManager.getActiveNetworkInfo();
+            }
+            if(networkInfo == null || !networkInfo.isConnected()){
+                Toast.makeText(this, getString(R.string.error_netConn), Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+        }
 
         globalProfile = (GlobalProfile)getApplicationContext();
 
@@ -110,14 +161,13 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         whiteSide = findViewById(R.id.whiteSide);
         blackSide = findViewById(R.id.blackSide);
 
-        Intent intent = getIntent();
-        //Obter dados sobre o modo de joga escolhido
-        //gamemode:
-        //  -> 0 - single player (default)
-        //  -> 1 - multiplayer (same device)
-        //  -> 2 - LAN server
-        //  -> 3 - LAN client
-        gameMode = intent.getIntExtra(INTENT_GAME_MODE, 0);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
         switch (gameMode) {
             case 0:     //SINGLE PLAYER
                 setUpOneDevices();
@@ -126,13 +176,12 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
                 setUpOneDevices();
                 break;
             case 2:
-                //LAN server
+                server();
                 break;
             case 3:
-                //LAN client
+                clientDlg();
                 break;
         }
-
 
         game.clearBoard();
         drawBoard();
@@ -174,12 +223,10 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
             case 0:
                 btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_enter));
                 break;
-            case 1:
+            default:
                 btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_exit));
                 break;
         }
-
-
     }
 
     private void setUpTabuleiro(LinearLayout llframe, LinearLayout llBoard){
@@ -285,7 +332,7 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
                 celulasTabuleiro[i][j].setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(gameMode == 0 || gameMode == 2 || gameMode==3 && players.get(0).getCorJogador()==game.currentPlayer) {
+                        if(gameMode == 0 || gameMode == 2 || gameMode==3 && players.get(0).getCorJogador() == game.currentPlayer) {
                             String id = getResources().getResourceName(v.getId());
                             int l = id.charAt(id.length() - 2) - 'a';
                             int c = Character.getNumericValue(id.charAt(id.length() - 1)) - 1;
@@ -307,12 +354,22 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
     }
 
     private void drawBoard(){
-        if (game.currentPlayer == Peca.WHITE) {
-            whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
-            blackSide.setBackgroundColor(0);
-        } else if (game.currentPlayer == Peca.BLACK) {
-            blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
-            whiteSide.setBackgroundColor(0);
+        if(gameMode != 3) {
+            if (game.currentPlayer == Peca.WHITE) {
+                whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+                blackSide.setBackgroundColor(0);
+            } else if (game.currentPlayer == Peca.BLACK) {
+                blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+                whiteSide.setBackgroundColor(0);
+            }
+        } else {
+            if(game.currentPlayer == Peca.WHITE){
+                blackSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+                whiteSide.setBackgroundColor(0);
+            } else if(game.currentPlayer == Peca.BLACK) {
+                whiteSide.setBackgroundColor(getResources().getColor(R.color.playSide));
+                blackSide.setBackgroundColor(0);
+            }
         }
 
         for(int i=0; i<8; i++){
@@ -342,8 +399,16 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
                 }
             }
         }
-        players.get(0).setPontuacao(pPlayer1);
-        players.get(1).setPontuacao(pPlayer2);
+        if(players.get(0).getCorJogador() == Peca.WHITE) {
+            players.get(0).setPontuacao(pPlayer1);
+            players.get(1).setPontuacao(pPlayer2);
+            tvPontuacao.setText(getString(R.string.pontuacao, pPlayer1, pPlayer2));
+        } else {
+            players.get(0).setPontuacao(pPlayer2);
+            players.get(1).setPontuacao(pPlayer1);
+            tvPontuacao.setText(getString(R.string.pontuacao, pPlayer2, pPlayer1));
+        }
+
         tvPontuacao.setText(getString(R.string.pontuacao, pPlayer1, pPlayer2));
     }
 
@@ -358,12 +423,15 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         if (game.gameover){
             gameOver();
         }
-
-
         //Jogada do computador
         if (gameMode == 0 && !game.jogaNovamente) {
             threadCOM = new JogadaCOMTHREAD(this);
             threadCOM.execute();
+        }
+
+        //Enviar mensagem para outro telemovel se não jogar 2X e for uma jogada válida
+        if((gameMode == 2 || gameMode == 3) && !game.jogaNovamente && capturado>0){
+            sendMove(x, y);
         }
 
     }
@@ -383,7 +451,6 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         }
 
         if(gameMode == 0 || gameMode == 1) {
-            String pontuacao = tvPontuacao.getText().toString();
             String vencedor = (players.get(0).getPontuacao() > players.get(1).getPontuacao()) ? players.get(0).getNickname() : players.get(1).getNickname();
             String titulo = getString(R.string.tituloVenceu, vencedor);
             String dialogo = getString(R.string.mensagemDialogo, players.get(0).getNickname(),
@@ -429,33 +496,14 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         }
     }
 
-    public void changeGameMode(View v){
+    public void changeGameModeDLG(View v){
         AlertDialog.Builder ad = new AlertDialog.Builder(this);
         ad.setTitle(getString(R.string.tituloMudarModo));
         ad.setMessage(getString(R.string.mensagemMudarModo));
         ad.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(gameMode == 0){
-                    gameMode = 1;
-                    game.changeMode(gameMode);
-                    players.get(1).setProfile(new Profile("Player 2"));
-                    nickP2.setText(players.get(1).getNickname());
-                    llBotoesPlayer2.setVisibility(View.VISIBLE);
-                    btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_exit));
-
-                } else if(gameMode == 1){
-                    gameMode = 0;
-                    game.changeMode(gameMode);
-                    players.get(1).setProfile(new Profile("COM"));
-                    nickP2.setText(players.get(1).getNickname());
-                    if(game.currentPlayer == Peca.BLACK) {
-                        threadCOM = new JogadaCOMTHREAD(getApplicationContext());
-                        threadCOM.execute();
-                    }
-                    llBotoesPlayer2.setVisibility(View.GONE);
-                    btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_enter));
-                }
+                changeGameMode();
             }
         });
         ad.setNegativeButton("Nope", new DialogInterface.OnClickListener() {
@@ -466,10 +514,29 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         });
         ad.create();
         ad.show();
+    }
 
+    private void changeGameMode(){
+        if(gameMode == 0){
+            gameMode = 1;
+            game.changeMode(gameMode);
+            players.get(1).setProfile(new Profile("Player 2"));
+            nickP2.setText(players.get(1).getNickname());
+            llBotoesPlayer2.setVisibility(View.VISIBLE);
+            btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_exit));
 
-
-
+        } else if(gameMode == 1){
+            gameMode = 0;
+            game.changeMode(gameMode);
+            players.get(1).setProfile(new Profile("COM"));
+            nickP2.setText(players.get(1).getNickname());
+            if(game.currentPlayer == Peca.BLACK) {
+                threadCOM = new JogadaCOMTHREAD(getApplicationContext());
+                threadCOM.execute();
+            }
+            llBotoesPlayer2.setVisibility(View.GONE);
+            btnMudarModo.setImageDrawable(getDrawable(R.drawable.ic_enter));
+        }
     }
 
     public void btnJogar2X(View v){
@@ -579,5 +646,267 @@ public class GameActivity extends AppCompatActivity implements GameRules.GameOve
         }
     }
 
+    private void sendMove(int x, int y) {
+        try {
+            //JSON MENSAGEM
+            JSONObject mensagem = new JSONObject();
 
+            //DADOS DO JOGADOR
+            JSONObject jogador = new JSONObject();
+            jogador.put("nick", players.get(0).getNickname());
+            try {
+                byte[] foto = players.get(0).getFotografia();
+                String fotoStr = Base64.encodeToString(foto, Base64.DEFAULT);
+                jogador.put("foto", fotoStr);
+            } catch (Exception e){
+                Log.d("REVERSI", "NÃO TEM FOTO DEFINIDA");
+            }
+
+            //JOGADA A ENVIAR
+            JSONObject jogada = new JSONObject();
+            jogada.put("x", x);
+            jogada.put("y", y);
+
+            //CIAR OBJETO A ENVIAR
+            mensagem.put("jogador", jogador);
+            mensagem.put("jogada", jogada);
+
+            Log.d("MSG JSON", mensagem.toString());
+
+            final String stringMensagem = mensagem.toString();
+
+            //THREAD PARA ENVIAR A MENSAGEM
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        output.println(stringMensagem);
+                        output.flush();
+                        Log.d("XPTO", "ENVIOU UMA MENSAGEM");
+                    } catch (Exception e) {
+                        Log.d("XPTO", "ERRO AO ENVIAR MENSAGEM");
+                    }
+                }
+            });
+            t.start();
+
+        } catch (Exception e) {
+            Log.d("XPTO", "ERRO AO CRIAR JSON OBJECT");
+        }
+    }
+
+    private void server(){
+        procMsg = new Handler();
+        players = new ArrayList<>();
+        players.add(new Player(globalProfile.getProfile(), Peca.WHITE, false));
+        players.add(new Player(new Profile("Player 2"), Peca.BLACK, false));
+
+        String ip = getLocalIPAdress();
+        pd = new ProgressDialog(this);
+        pd.setTitle(getString(R.string.btnServidor));
+        pd.setMessage(getString(R.string.serverDlg_msg)+"\nIP: "+ip);
+        pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+                if(serverSocket!=null){
+                    try{
+                        serverSocket.close();
+                    } catch (IOException e){
+                        e.printStackTrace();
+                    }
+                    serverSocket=null;
+                }
+            }
+        });
+        pd.show();
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    serverSocket = new ServerSocket(PORT);
+                    socketGame = serverSocket.accept();
+                    serverSocket.close();
+                    serverSocket = null;
+                    commThread.start();
+                }catch (IOException e){
+                    e.printStackTrace();
+                    socketGame = null;
+                }
+                procMsg.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        pd.dismiss();
+                        if(!socketGame.isConnected()){
+                            finish();
+                        }
+                    }
+                });
+            }
+        });
+        t.start();
+    }
+
+    private void clientDlg(){
+        procMsg = new Handler();
+        players = new ArrayList<>();
+        players.add(new Player(globalProfile.getProfile(), Peca.BLACK, false));
+        players.add(new Player(new Profile("Player 2"), Peca.WHITE, false));
+
+
+        final EditText edIp = new EditText(this);
+        edIp.setText("10.0.2.2");
+        AlertDialog.Builder ad = new AlertDialog.Builder(this);
+        ad.setTitle(getString(R.string.btnCliente));
+        ad.setMessage(getString(R.string.ipServidor));
+        ad.setView(edIp);
+        ad.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                client(edIp.getText().toString(), PORT);
+            }
+        });
+        ad.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
+        ad.create();
+        ad.show();
+    }
+
+    private void client(final String strIP, final int port){
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    socketGame=new Socket(strIP, port);
+                } catch (Exception e){
+                    socketGame=null;
+                }
+                if(socketGame==null){
+                    procMsg.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    });
+                    return;
+                }
+                commThread.start();
+            }
+        });
+        t.start();
+    }
+
+    Thread commThread = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            try {
+                input = new BufferedReader(new InputStreamReader(socketGame.getInputStream()));
+                output = new PrintWriter(socketGame.getOutputStream());
+                while(!Thread.currentThread().isInterrupted()){
+                    try {
+                        Log.d("XPTO", "RECEBEU UMA MENSAGEM");
+
+                        //CONVERTER A STRING LIDA EM JSON
+                        String read = input.readLine();
+                        JSONObject mensagem = new JSONObject(read);
+                        JSONObject jogador = mensagem.getJSONObject("jogador");
+                        JSONObject jogada = mensagem.getJSONObject("jogada");
+
+                        //Contruir o perfil
+                        final String nick = jogador.getString("nick");
+
+                        try {
+                            String foto = jogador.getString("foto");
+                            byte[] fotoDecoded = null;
+                            fotoDecoded = Base64.decode(foto, Base64.DEFAULT);
+                            players.get(1).setProfile(new Profile(nick, fotoDecoded));
+                        } catch (Exception e){
+                            players.get(1).setProfile(new Profile(nick));
+                        }
+
+                        //Fazer a jogada
+                        final int x = jogada.getInt("x");
+                        final int y = jogada.getInt("y");
+
+                        procMsg.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                //IMPRIMIR O TABULEIRO E PASSAR A VEZ
+                                game.move(x, y, true);
+                                game.nextTurn(false);
+                                defPlayer2();
+                                drawBoard();
+                                calcPontuacao();
+                            }
+                        });
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            } catch (Exception e){
+                procMsg.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        finish();
+                        Toast.makeText(getApplicationContext(), getString(R.string.jogadorSaiu), Toast.LENGTH_LONG).show();
+                        changeGameMode();
+                    }
+                });
+            }
+        }
+    });
+
+    private void defPlayer2(){
+        String nick = players.get(1).getNickname();
+        nickP2.setText(nick);
+        byte foto[] = players.get(1).getFotografia();
+        if(foto!=null) {
+            Bitmap bmp = BitmapFactory.decodeByteArray(foto, 0, foto.length);
+            BitmapDrawable image = new BitmapDrawable(fotoP2.getResources(), bmp);
+            fotoP2.setImageBitmap(image.getBitmap());
+        } else {
+            fotoP2.setImageDrawable(getDrawable(R.drawable.ic_account));
+        }
+    }
+
+    private static String getLocalIPAdress(){
+        try{
+            for (Enumeration<NetworkInterface> en =  NetworkInterface.getNetworkInterfaces();
+                    en.hasMoreElements();){
+                NetworkInterface intf = en.nextElement();
+                for(Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();){
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if(!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address){
+                        return inetAddress.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    protected void onPause(){
+        super.onPause();
+        try{
+            commThread.interrupt();
+            if(socketGame!=null)
+                socketGame.close();
+            if(output!=null)
+                output.close();
+            if(input!=null)
+                input.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        input = null;
+        output = null;
+        socketGame = null;
+    }
 }

@@ -84,7 +84,8 @@
                 android:layout_height="match_parent"
                 android:text="@string/em_LAN"
                 style="@style/AppTheme.ButtonOutlined"
-                android:layout_margin="10dp"/>
+                android:layout_margin="10dp"
+                android:onClick="startLAN"/>
         </LinearLayout>
 
     </LinearLayout>

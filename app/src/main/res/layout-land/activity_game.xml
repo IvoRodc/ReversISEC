@@ -39,7 +39,7 @@
                 android:gravity="end"
                 android:src="@drawable/ic_enter"
                 android:tint="@color/cinzaISEC"
-                android:onClick="changeGameMode"/>
+                android:onClick="changeGameModeDLG"/>
         </LinearLayout>
 
     </LinearLayout>
